@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// generator cria um canal que emite os números fornecidos sequencialmente.
 func generator(nums ...int) <-chan int {
 	out := make(chan int)
 	go func() {
@@ -17,6 +18,8 @@ func generator(nums ...int) <-chan int {
 	return out
 }
 
+// worker consome valores de um canal de entrada e devolve o quadrado de cada
+// elemento após um pequeno atraso aleatório para simular trabalho pesado.
 func worker(in <-chan int) <-chan int {
 	out := make(chan int)
 	go func() {
@@ -29,6 +32,7 @@ func worker(in <-chan int) <-chan int {
 	return out
 }
 
+// merge realiza o fan-in combinando múltiplos canais em um único fluxo de saída.
 func merge(chs ...<-chan int) <-chan int {
 	out := make(chan int)
 	go func() {
@@ -45,11 +49,11 @@ func merge(chs ...<-chan int) <-chan int {
 func main() {
 	in := generator(1, 2, 3, 4, 5, 6, 7, 8)
 
-	// Fan-out
+	// Fan-out: distribui o trabalho entre duas goroutines.
 	w1 := worker(in)
 	w2 := worker(in)
 
-	// Fan-in
+	// Fan-in: agrega as respostas dos workers no mesmo canal.
 	for res := range merge(w1, w2) {
 		fmt.Println("resultado:", res)
 	}

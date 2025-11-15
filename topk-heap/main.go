@@ -5,10 +5,12 @@ import (
 	"fmt"
 )
 
+// Item representa um valor armazenado no heap mínimo.
 type Item struct {
 	Value int
 }
 
+// MinHeap implementa a interface heap.Interface para manter o menor elemento no topo.
 type MinHeap []Item
 
 func (h MinHeap) Len() int           { return len(h) }
@@ -38,8 +40,10 @@ func TopK(nums []int, k int) []int {
 
 	for _, v := range nums {
 		if h.Len() < k {
+			// Preenche o heap até ter k elementos.
 			heap.Push(h, Item{Value: v})
 		} else if v > (*h)[0].Value {
+			// Substitui o menor quando encontramos um número maior.
 			heap.Pop(h)
 			heap.Push(h, Item{Value: v})
 		}

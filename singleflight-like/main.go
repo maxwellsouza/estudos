@@ -6,12 +6,14 @@ import (
 	"time"
 )
 
+// call armazena o resultado compartilhado e sincroniza leitores concorrentes.
 type call struct {
 	wg  sync.WaitGroup
 	val any
 	err error
 }
 
+// Group mapeia chaves para chamadas em andamento, evitando duplicação de trabalho.
 type Group struct {
 	mu sync.Mutex
 	m  map[string]*call
@@ -24,6 +26,7 @@ func (g *Group) Do(key string, fn func() (any, error)) (any, error) {
 		g.m = make(map[string]*call)
 	}
 	if c, ok := g.m[key]; ok {
+		// Já existe uma operação em andamento; aguarda o resultado.
 		g.mu.Unlock()
 		c.wg.Wait()
 		return c.val, c.err
@@ -34,6 +37,7 @@ func (g *Group) Do(key string, fn func() (any, error)) (any, error) {
 	g.m[key] = c
 	g.mu.Unlock()
 
+	// Executa a função lentamente (ou remotamente) fora do lock.
 	c.val, c.err = fn()
 	c.wg.Done()
 

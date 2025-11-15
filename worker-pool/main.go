@@ -8,17 +8,20 @@ import (
 	"time"
 )
 
+// Job define uma unidade de trabalho que será processada pelos workers.
 type Job struct {
 	ID   int
 	Data int
 }
 
+// Result guarda a saída de um job processado.
 type Result struct {
 	JobID int
 	Out   int
 	Err   error
 }
 
+// worker aguarda jobs, processa cada um e envia o resultado pelo canal.
 func worker(ctx context.Context, id int, jobs <-chan Job, results chan<- Result, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for {
