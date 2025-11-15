@@ -9,10 +9,13 @@ import (
 	"time"
 )
 
+// ErrMaxRetries indica que todas as tentativas foram esgotadas.
 var ErrMaxRetries = errors.New("max retries reached")
 
 type Operation func(ctx context.Context) error
 
+// Retry executa uma operação até que ela retorne sucesso, respeitando o
+// número máximo de tentativas e aplicando exponencial backoff com jitter.
 func Retry(ctx context.Context, op Operation, maxRetries int, baseDelay time.Duration) error {
 	var attempt int
 	for {

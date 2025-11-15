@@ -19,6 +19,7 @@ type entry[K comparable, V any] struct {
 	value V
 }
 
+// NewCache prepara uma instância com capacidade fixa.
 func NewCache[K comparable, V any](capacity int) *Cache[K, V] {
 	if capacity <= 0 {
 		panic("capacity must be > 0")
@@ -30,6 +31,8 @@ func NewCache[K comparable, V any](capacity int) *Cache[K, V] {
 	}
 }
 
+// Get recupera o valor associado à chave e o move para a frente da lista
+// para marcar como o mais recentemente usado.
 func (c *Cache[K, V]) Get(key K) (V, bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -45,6 +48,8 @@ func (c *Cache[K, V]) Get(key K) (V, bool) {
 	return elem.Value.(entry[K, V]).value, true
 }
 
+// Put insere ou atualiza um item e remove o menos utilizado se exceder a
+// capacidade.
 func (c *Cache[K, V]) Put(key K, value V) {
 	c.mu.Lock()
 	defer c.mu.Unlock()

@@ -13,6 +13,8 @@ type TokenBucket struct {
 	stop     chan struct{}
 }
 
+// NewTokenBucket inicia o reabastecimento periódico do bucket e devolve a
+// estrutura pronta para uso.
 func NewTokenBucket(ratePerSec, capacity int) *TokenBucket {
 	tb := &TokenBucket{
 		capacity: capacity,
@@ -37,6 +39,7 @@ func NewTokenBucket(ratePerSec, capacity int) *TokenBucket {
 	return tb
 }
 
+// Allow devolve se há tokens disponíveis para consumir.
 func (tb *TokenBucket) Allow() bool {
 	if tb.tokens > 0 {
 		tb.tokens--
@@ -45,6 +48,7 @@ func (tb *TokenBucket) Allow() bool {
 	return false
 }
 
+// Stop encerra a goroutine interna e libera recursos.
 func (tb *TokenBucket) Stop() {
 	close(tb.stop)
 	tb.ticker.Stop()
